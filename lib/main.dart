@@ -79,7 +79,7 @@ return outputFormat.format(parsedDate);
 Widget build(BuildContext context) {
  return Scaffold(
    appBar: AppBar(
-     title: const Text(''),
+    title: Text('地震情報'),
    ),
    body: RefreshIndicator(
      onRefresh: () async {
