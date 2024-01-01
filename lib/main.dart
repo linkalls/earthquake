@@ -68,37 +68,51 @@ String formatDateTime(String? dateStr) {
  }
 }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Earthquake Data'),
-      ),
-      body: FutureBuilder<List<Earthquake>>(
-        future: futureEarthquakes,
-        builder: (context, snapshot) {
-// ignore: avoid_print
-if (snapshot.hasError) print(snapshot.error);
-         return snapshot.hasData
-  ? ListView.builder(
-      itemCount: snapshot.data!.length,
-      itemBuilder: (context, index) {
-        int reversedIndex = snapshot.data!.length - 1 - index;
-        return ListTile(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('日時: ${formatDateTime(snapshot.data![reversedIndex].ctt)}'),
-              Text('震央地名: ${snapshot.data![reversedIndex].anm}'),
-              Text('マグニチュード: ${snapshot.data![reversedIndex].mag}'),
-            ],
-          ),
-        );
-      },
-    )
-  : const CircularProgressIndicator();
-        },
-      ),
-    );
-  }
+@override
+Widget build(BuildContext context) {
+ return Scaffold(
+   appBar: AppBar(
+     title: const Text('Earthquake Data'),
+   ),
+   body: RefreshIndicator(
+     onRefresh: () async {
+       setState(() {
+         futureEarthquakes = fetchEarthquakes();
+       });
+     },
+     child: FutureBuilder<List<Earthquake>>(
+       future: futureEarthquakes,
+        builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
+ if (snapshot.connectionState == ConnectionState.waiting) {
+   return CircularProgressIndicator();
+ } else if (snapshot.hasError) {
+   return Text('Error: ${snapshot.error}');
+ } else {
+   return ListView.builder(
+     itemCount: snapshot.data!.length,
+     itemBuilder: (context, index) {
+       int reversedIndex = snapshot.data!.length - 1 - index;
+       return Card(
+         margin: EdgeInsets.all(8),
+         child: ListTile(
+           title: Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+               Text('日時: ${formatDateTime(snapshot.data![reversedIndex].ctt)}', style: TextStyle(fontSize: 18)),
+               Divider(),
+               Text('震央地名: ${snapshot.data![reversedIndex].anm}', style: TextStyle(fontSize: 18)),
+               Divider(),
+               Text('マグニチュード: ${snapshot.data![reversedIndex].mag}', style: TextStyle(fontSize: 18)),
+             ],
+           ),
+         ),
+       );
+     },
+   );
+ }
+},
+     ),
+   ),
+ );
+}
 }
