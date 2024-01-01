@@ -73,7 +73,7 @@ String formatDateTime(String? dateStr) {
 Widget build(BuildContext context) {
  return Scaffold(
    appBar: AppBar(
-     title: const Text('Earthquake Data'),
+     title: const Text('地震情報'),
    ),
    body: RefreshIndicator(
      onRefresh: () async {
