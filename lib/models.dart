@@ -4,16 +4,14 @@ class Earthquake {
  final String anm;
  final String rdt;
  final String mag;
- final String time;
 
- Earthquake({this.anm = '', this.rdt = '', this.mag = '', this.time = ''});
+ Earthquake({this.anm = '', this.rdt = '', this.mag = '', });
 
  factory Earthquake.fromJson(Map<String, dynamic> json) {
   return Earthquake(
    anm: json['anm'] ?? '',
    rdt: json['rdt'] ?? '',
    mag: json['mag'] ?? '',
-   time: json['time'] ?? '',
   );
  }
 

@@ -24,18 +24,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 Future<List<Earthquake>> fetchEarthquakes() async {
  final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
 
+ List<Earthquake> earthquakes = []; // Define earthquakes here
+
  if (response.statusCode == 200) {
    List<dynamic> jsonResponse = jsonDecode(response.body);
-   List<Earthquake> earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-   earthquakes.sort((a, b) => a.time.compareTo(b.time)); // Sort by time in ascending order // Sort by time in descending order
-   earthquakes = earthquakes.take(200).toList(); // Take the first 20 items
-   return earthquakes;
-} else {
+   earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+   // Rest of your code...
+ } else {
    throw Exception('Failed to load earthquake data');
-}
+ }
+
+ return earthquakes;
 }
 
 class _EarthquakePage extends StatefulWidget {
@@ -92,25 +96,24 @@ Widget build(BuildContext context) {
    return Text('Error: ${snapshot.error}');
  } else {
    return ListView.builder(
-     itemCount: snapshot.data!.length,
-     itemBuilder: (context, index) {
-       int reversedIndex = snapshot.data!.length - 1 - index;
-       return Card(
-         margin: EdgeInsets.all(8),
-         child: ListTile(
-           title: Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
-             children: [
-               Text('日時: ${formatDateTime(snapshot.data![reversedIndex].rdt)}', style: TextStyle(fontSize: 18)),
-               Divider(),
-               Text('震央地名: ${snapshot.data![reversedIndex].anm}', style: TextStyle(fontSize: 18)),
-               Divider(),
-               Text('マグニチュード: ${snapshot.data![reversedIndex].mag}', style: TextStyle(fontSize: 18)),
-             ],
-           ),
-         ),
-       );
-     },
+    itemCount: snapshot.data!.length,
+    itemBuilder: (context, index) {
+      return Card(
+        margin: EdgeInsets.all(8),
+        child: ListTile(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: TextStyle(fontSize: 18)),
+              Divider(),
+              Text('震央地名: ${snapshot.data![index].anm}', style: TextStyle(fontSize: 18)),
+              Divider(),
+              Text('マグニチュード: ${snapshot.data![index].mag}', style: TextStyle(fontSize: 18)),
+            ],
+          ),
+        ),
+      );
+    },
    );
  }
 },
