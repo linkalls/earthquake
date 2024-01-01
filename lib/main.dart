@@ -24,14 +24,16 @@ class MyApp extends StatelessWidget {
 }
 
 Future<List<Earthquake>> fetchEarthquakes() async {
-  final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
+ final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
 
-  if (response.statusCode == 200) {
-    List<dynamic> jsonResponse = jsonDecode(response.body);
-    return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-  } else {
-    throw Exception('Failed to load earthquake data');
-  }
+ if (response.statusCode == 200) {
+   List<dynamic> jsonResponse = jsonDecode(response.body);
+   List<Earthquake> earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+   earthquakes.sort((a, b) => b.time.compareTo(a.time)); // Sort by time in descending order
+   return earthquakes.take(20).toList(); // Take the first 20 items
+ } else {
+   throw Exception('Failed to load earthquake data');
+ }
 }
 
 class _EarthquakePage extends StatefulWidget {
@@ -50,16 +52,20 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     futureEarthquakes = fetchEarthquakes();
   }
 
-String formatDateTime(String dateStr) {
-  try {
-    var inputFormat = DateFormat("yyyyMMddHHmmss");
-    var outputFormat = DateFormat("yyyy-MM-dd HH:mm:ss");
-    var parsedDate = inputFormat.parse(dateStr);
-    return outputFormat.format(parsedDate);
-  } catch (e) {
-    print('Error parsing date: $e');
-    return dateStr; // Return the original string if parsing fails
-  }
+String formatDateTime(String? dateStr) {
+ if (dateStr == null || dateStr.isEmpty) {
+ return '';
+ }
+ try {
+ var inputFormat = DateFormat("yyyyMMddHHmmss");
+ var outputFormat = DateFormat("yyyy-MM-dd-HH:mm"); // Changed format here
+ var parsedDate = inputFormat.parse(dateStr);
+ return outputFormat.format(parsedDate);
+ } catch (e) {
+ // ignore: avoid_print
+ print('Error parsing date: $e'); 
+ return dateStr; // Return the original string if parsing fails
+ }
 }
 
   @override
@@ -71,25 +77,26 @@ String formatDateTime(String dateStr) {
       body: FutureBuilder<List<Earthquake>>(
         future: futureEarthquakes,
         builder: (context, snapshot) {
-          if (snapshot.hasError) print(snapshot.error);
-
-          return snapshot.hasData
-              ? ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Row(
-                        children: [
-                          Expanded(child: Text(snapshot.data![index].anm)),
-                          Text(snapshot.data![index].ctt),
-                          Text(snapshot.data![index].mag),
-                          Text(formatDateTime(snapshot.data![index].time)), // Fixed code
-                        ],
-                      ),
-                    );
-                  },
-                )
-              : const CircularProgressIndicator();
+// ignore: avoid_print
+if (snapshot.hasError) print(snapshot.error);
+         return snapshot.hasData
+  ? ListView.builder(
+      itemCount: snapshot.data!.length,
+      itemBuilder: (context, index) {
+        int reversedIndex = snapshot.data!.length - 1 - index;
+        return ListTile(
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('日時: ${formatDateTime(snapshot.data![reversedIndex].ctt)}'),
+              Text('震央地名: ${snapshot.data![reversedIndex].anm}'),
+              Text('マグニチュード: ${snapshot.data![reversedIndex].mag}'),
+            ],
+          ),
+        );
+      },
+    )
+  : const CircularProgressIndicator();
         },
       ),
     );
