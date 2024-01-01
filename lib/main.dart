@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Earthquake Data',
+      title: '地震情報',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
