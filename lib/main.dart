@@ -58,28 +58,41 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     futureEarthquakes = fetchEarthquakes();
   }
 
+ Future<void> refreshEarthquakes() async {
+   setState(() {
+     futureEarthquakes = fetchEarthquakes().then((earthquakes) {
+      for (var earthquake in earthquakes) {
+ earthquakes[earthquakes.indexOf(earthquake)] = Earthquake(
+   anm: earthquake.anm,
+   rdt: formatDateTime(earthquake.rdt),
+   mag: earthquake.mag,
+ );
+}
+       return earthquakes;
+     });
+   });
+ }
+
+
 String formatDateTime(String? dateStr) {
  if (dateStr == null || dateStr.isEmpty) {
  return '';
  }
  try {
-var inputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-var outputFormat = DateFormat("yyyy年MM月dd日HH時mm分");
-var parsedDate = inputFormat.parse(dateStr);
-parsedDate = parsedDate.add(Duration(hours: 9)); // Convert to JST
-return outputFormat.format(parsedDate);
+ var inputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+ var outputFormat = DateFormat("yyyy年MM月dd日HH時mm分");
+ var parsedDate = inputFormat.parse(dateStr);
+ return outputFormat.format(parsedDate);
  } catch (e) {
- // ignore: avoid_print
- print('Error parsing date: $e'); 
- return dateStr; // Return the original string if parsing fails
+ print('Error parsing date: $e');
+ return dateStr; // パース失敗時は元の文字列を返す
  }
 }
-
 @override
 Widget build(BuildContext context) {
  return Scaffold(
    appBar: AppBar(
-    title: Text('地震情報'),
+    title: const Text('地震情報'),
    ),
    body: RefreshIndicator(
      onRefresh: () async {
@@ -91,7 +104,7 @@ Widget build(BuildContext context) {
        future: futureEarthquakes,
         builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
  if (snapshot.connectionState == ConnectionState.waiting) {
-   return CircularProgressIndicator();
+   return  const CircularProgressIndicator();
  } else if (snapshot.hasError) {
    return Text('Error: ${snapshot.error}');
  } else {
@@ -99,16 +112,16 @@ Widget build(BuildContext context) {
     itemCount: snapshot.data!.length,
     itemBuilder: (context, index) {
       return Card(
-        margin: EdgeInsets.all(8),
+        margin: const EdgeInsets.all(8),
         child: ListTile(
           title: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: TextStyle(fontSize: 18)),
-              Divider(),
-              Text('震央地名: ${snapshot.data![index].anm}', style: TextStyle(fontSize: 18)),
-              Divider(),
-              Text('マグニチュード: ${snapshot.data![index].mag}', style: TextStyle(fontSize: 18)),
+              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
+              const Divider(),
+              Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
+              const Divider(),
+              Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
             ],
           ),
         ),
