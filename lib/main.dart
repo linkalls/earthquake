@@ -30,11 +30,12 @@ Future<List<Earthquake>> fetchEarthquakes() async {
  if (response.statusCode == 200) {
    List<dynamic> jsonResponse = jsonDecode(response.body);
    List<Earthquake> earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-   earthquakes.sort((a, b) => b.time.compareTo(a.time)); // Sort by time in descending order
-   return earthquakes; // Take the first 20 items
- } else {
+   earthquakes.sort((a, b) => a.time.compareTo(b.time)); // Sort by time in ascending order // Sort by time in descending order
+   earthquakes = earthquakes.take(200).toList(); // Take the first 20 items
+   return earthquakes;
+} else {
    throw Exception('Failed to load earthquake data');
- }
+}
 }
 
 class _EarthquakePage extends StatefulWidget {
@@ -58,10 +59,11 @@ String formatDateTime(String? dateStr) {
  return '';
  }
  try {
- var inputFormat = DateFormat("yyyyMMddHHmmss");
- var outputFormat = DateFormat("yyyy-MM-dd-HH:mm"); // Changed format here
- var parsedDate = inputFormat.parse(dateStr);
- return outputFormat.format(parsedDate);
+var inputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+var outputFormat = DateFormat("yyyy年MM月dd日HH時mm分");
+var parsedDate = inputFormat.parse(dateStr);
+parsedDate = parsedDate.add(Duration(hours: 9)); // Convert to JST
+return outputFormat.format(parsedDate);
  } catch (e) {
  // ignore: avoid_print
  print('Error parsing date: $e'); 
@@ -73,7 +75,7 @@ String formatDateTime(String? dateStr) {
 Widget build(BuildContext context) {
  return Scaffold(
    appBar: AppBar(
-     title: const Text('地震情報'),
+     title: const Text(''),
    ),
    body: RefreshIndicator(
      onRefresh: () async {
@@ -99,7 +101,7 @@ Widget build(BuildContext context) {
            title: Column(
              crossAxisAlignment: CrossAxisAlignment.start,
              children: [
-               Text('日時: ${formatDateTime(snapshot.data![reversedIndex].ctt)}', style: TextStyle(fontSize: 18)),
+               Text('日時: ${formatDateTime(snapshot.data![reversedIndex].rdt)}', style: TextStyle(fontSize: 18)),
                Divider(),
                Text('震央地名: ${snapshot.data![reversedIndex].anm}', style: TextStyle(fontSize: 18)),
                Divider(),
