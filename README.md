@@ -1,6 +1,6 @@
 # earthquake_fl
 
-A new Flutter project.
+flutterで作った地震情報を取得できるアプリ
 
 ## Getting Started
 
