@@ -31,7 +31,7 @@ Future<List<Earthquake>> fetchEarthquakes() async {
    List<dynamic> jsonResponse = jsonDecode(response.body);
    List<Earthquake> earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
    earthquakes.sort((a, b) => b.time.compareTo(a.time)); // Sort by time in descending order
-   return earthquakes.take(20).toList(); // Take the first 20 items
+   return earthquakes; // Take the first 20 items
  } else {
    throw Exception('Failed to load earthquake data');
  }
