@@ -1,16 +1,21 @@
-# earthquake_fl
+#地震情報アプリ
+このアプリは、日本の地震情報を取得し、表示するためのものです。
 
-flutterで作った地震情報を取得できるアプリ
+# 機能
+地震情報の取得と表示
+地震情報の更新（プルダウンで更新）
+地震情報のソート（新しい情報が上に来るように）
+使用技術
+Dart
+Flutter
+http パッケージ（APIからデータを取得するため）
+intl パッケージ（日付の解析とフォーマットのため）
+# 使い方
+アプリを起動します。
+地震情報が自動的に取得され、リストとして表示されます。
+最新の情報を取得するには、リストをプルダウンして更新します。
+# 注意事項
+このアプリはデモ用であり、地震情報の正確性や完全性を保証するものではありません。地震情報は公式の気象庁の発表をご確認ください。
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ライセンス
+このプロジェクトはMITライセンスの下で公開されています。詳細はLICENSEをご覧ください。
