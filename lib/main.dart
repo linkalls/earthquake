@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         brightness: Brightness.light,
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           bodyLarge: TextStyle(color: Colors.black),
           bodyMedium: TextStyle(color: Colors.black),
         ),
@@ -94,8 +94,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
   }
 
   Future<void> launchUrl(Uri url) async {
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
+   if (await canLaunchUrl(url)) {
+     await launchUrl(url);
     } else {
       throw 'Could not launch $url';
     }
@@ -116,7 +116,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Modified from\n',
+                        text: 'Modified from',
                         style: DefaultTextStyle.of(context).style.copyWith(
                           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
                           fontSize: 8.0
@@ -131,7 +131,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                           },
                       ),
                       TextSpan(
-                        text: ' provided by ',
+                        text: ' provided by\n ',
                         style: DefaultTextStyle.of(context).style.copyWith(
                           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
                           fontSize: 8.0
