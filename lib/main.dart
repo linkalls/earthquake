@@ -93,13 +93,13 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     }
   }
 
- Future<void> launchUrl(Uri url) async {
-  if (await canLaunch(url.toString())) {
-    await launch(url.toString());
-  } else {
-    throw 'Could not launch $url';
+  Future<void> launchUrl(Uri url) async {
+    if (await canLaunch(url.toString())) {
+      await launch(url.toString());
+    } else {
+      throw 'Could not launch $url';
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +116,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Modified from',
+                        text: 'Modified from\n',
                         style: DefaultTextStyle.of(context).style.copyWith(
                           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
                           fontSize: 8.0
@@ -131,7 +131,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                           },
                       ),
                       TextSpan(
-                        text: ' provided by\n ',
+                        text: ' provided by ',
                         style: DefaultTextStyle.of(context).style.copyWith(
                           color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
                           fontSize: 8.0
@@ -166,7 +166,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
             future: futureEarthquakes,
             builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
