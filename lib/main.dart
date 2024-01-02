@@ -3,7 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'models.dart';
 import 'package:intl/intl.dart';
-
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,22 +26,20 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
 Future<List<Earthquake>> fetchEarthquakes() async {
- final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
+  final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
 
- List<Earthquake> earthquakes = []; // Define earthquakes here
+  List<Earthquake> earthquakes = []; // Define earthquakes here
 
- if (response.statusCode == 200) {
-   List<dynamic> jsonResponse = jsonDecode(response.body);
-   earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-   // Rest of your code...
- } else {
-   throw Exception('Failed to load earthquake data');
- }
+  if (response.statusCode == 200) {
+    List<dynamic> jsonResponse = jsonDecode(response.body);
+    earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+    // Rest of your code...
+  } else {
+    throw Exception('Failed to load earthquake data');
+  }
 
- return earthquakes;
+  return earthquakes;
 }
 
 class _EarthquakePage extends StatefulWidget {
@@ -59,81 +58,127 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     futureEarthquakes = fetchEarthquakes();
   }
 
- Future<void> refreshEarthquakes() async {
-   setState(() {
-     futureEarthquakes = fetchEarthquakes().then((earthquakes) {
-      for (var earthquake in earthquakes) {
- earthquakes[earthquakes.indexOf(earthquake)] = Earthquake(
-   anm: earthquake.anm,
-   rdt: formatDateTime(earthquake.rdt),
-   mag: earthquake.mag,
- );
-}
-       return earthquakes;
-     });
-   });
- }
+  Future<void> refreshEarthquakes() async {
+    setState(() {
+      futureEarthquakes = fetchEarthquakes().then((earthquakes) {
+        for (var earthquake in earthquakes) {
+          earthquakes[earthquakes.indexOf(earthquake)] = Earthquake(
+            anm: earthquake.anm,
+            rdt: formatDateTime(earthquake.rdt),
+            mag: earthquake.mag,
+          );
+        }
+        return earthquakes;
+      });
+    });
+  }
 
+  String formatDateTime(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) {
+      return '';
+    }
+    try {
+      var inputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+      var outputFormat = DateFormat("yyyy年MM月dd日HH時mm分");
+      var parsedDate = inputFormat.parse(dateStr);
+      return outputFormat.format(parsedDate);
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error parsing date: $e');
+      return dateStr; // パース失敗時は元の文字列を返す
+    }
+  }
 
-String formatDateTime(String? dateStr) {
- if (dateStr == null || dateStr.isEmpty) {
- return '';
- }
- try {
- var inputFormat = DateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
- var outputFormat = DateFormat("yyyy年MM月dd日HH時mm分");
- var parsedDate = inputFormat.parse(dateStr);
- return outputFormat.format(parsedDate);
- } catch (e) {
- // ignore: avoid_print
-print('Error parsing date: $e');
- return dateStr; // パース失敗時は元の文字列を返す
- }
-}
-@override
-Widget build(BuildContext context) {
- return Scaffold(
-   appBar: AppBar(
-    title: const Text('地震情報'),
-   ),
-   body: RefreshIndicator(
-     onRefresh: () async {
-       setState(() {
-         futureEarthquakes = fetchEarthquakes();
-       });
-     },
-     child: FutureBuilder<List<Earthquake>>(
-       future: futureEarthquakes,
-        builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
- if (snapshot.connectionState == ConnectionState.waiting) {
-   return  const CircularProgressIndicator();
- } else if (snapshot.hasError) {
-   return Text('Error: ${snapshot.error}');
- } else {
-   return ListView.builder(
-    itemCount: snapshot.data!.length,
-    itemBuilder: (context, index) {
-      return Card(
-        margin: const EdgeInsets.all(8),
-        child: ListTile(
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
-              const Divider(),
-              Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
-              const Divider(),
-              Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
-            ],
+  Future<void> launchUrl(Uri url) async {
+    if (await canLaunch(url.toString())) {
+      await launch(url.toString());
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('地震情報'),
+      ),
+      body: Stack(
+        children: <Widget>[
+          FutureBuilder<List<Earthquake>>(
+            future: futureEarthquakes,
+            builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.all(8),
+                      child: ListTile(
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
+                            const Divider(),
+                            Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
+                            const Divider(),
+                            Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
+            },
           ),
-        ),
-      );
-    },
-   );
- }
-},
-     ),
-   ),
- );
-}
+          Positioned(
+            top: 10.0,
+            right: 10.0,
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Modified from ',
+                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                    ),
+                    TextSpan(
+                      text: 'Earthquake information',
+                      style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          launchUrl(Uri.parse('https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
+                        },
+                    ),
+                    TextSpan(
+                      text: ' provided by ',
+                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                    ),
+                    TextSpan(
+                      text: 'JMA',
+                      style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          launchUrl(Uri.parse('https://www.jma.go.jp/jma/index.html'));
+                        },
+                    ),
+                    TextSpan(
+                      text: '. Details can be found on the JMA website.',
+                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
