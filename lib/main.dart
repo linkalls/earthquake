@@ -20,6 +20,11 @@ class MyApp extends StatelessWidget {
       title: '地震情報',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        brightness: Brightness.light, // This makes the theme of your app light.
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark, // This makes the theme of your app dark.
       ),
       home: const _EarthquakePage(),
     );
