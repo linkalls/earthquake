@@ -85,7 +85,8 @@ String formatDateTime(String? dateStr) {
  var parsedDate = inputFormat.parse(dateStr);
  return outputFormat.format(parsedDate);
  } catch (e) {
- print('Error parsing date: $e');
+ // ignore: avoid_print
+print('Error parsing date: $e');
  return dateStr; // パース失敗時は元の文字列を返す
  }
 }
