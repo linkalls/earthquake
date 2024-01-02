@@ -20,11 +20,19 @@ class MyApp extends StatelessWidget {
       title: '地震情報',
       theme: ThemeData(
         primarySwatch: Colors.blue,
-        brightness: Brightness.light, // This makes the theme of your app light.
+        brightness: Brightness.light,
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black),
+          bodyMedium: TextStyle(color: Colors.black),
+        ),
       ),
       darkTheme: ThemeData(
         primarySwatch: Colors.blue,
-        brightness: Brightness.dark, // This makes the theme of your app dark.
+        brightness: Brightness.dark,
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(color: Colors.white),
+          bodyMedium: TextStyle(color: Colors.white),
+        ),
       ),
       home: const _EarthquakePage(),
     );
@@ -85,13 +93,13 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     }
   }
 
-  Future<void> launchUrl(Uri url) async {
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
-    } else {
-      throw 'Could not launch $url';
-    }
+ Future<void> launchUrl(Uri url) async {
+  if (await canLaunch(url.toString())) {
+    await launch(url.toString());
+  } else {
+    throw 'Could not launch $url';
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -102,29 +110,36 @@ class _EarthquakePageState extends State<_EarthquakePage> {
           GestureDetector(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Center(
+              child: Align(
+                alignment: Alignment.centerLeft,
                 child: RichText(
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: 'Modified from ',
-                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                        text: 'Modified from',
+                        style: DefaultTextStyle.of(context).style.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          fontSize: 8.0
+                        ),
                       ),
                       TextSpan(
                         text: 'Earthquake information',
-                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             launchUrl(Uri.parse('https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
                           },
                       ),
                       TextSpan(
-                        text: ' provided by ',
-                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                        text: ' provided by\n ',
+                        style: DefaultTextStyle.of(context).style.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          fontSize: 8.0
+                        ),
                       ),
                       TextSpan(
                         text: 'JMA',
-                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
                             launchUrl(Uri.parse('https://www.jma.go.jp/jma/index.html'));
@@ -132,7 +147,10 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                       ),
                       TextSpan(
                         text: '. Details can be found on the JMA website.',
-                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                        style: DefaultTextStyle.of(context).style.copyWith(
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          fontSize: 8.0
+                        ),
                       ),
                     ],
                   ),
