@@ -60,16 +60,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
 
   Future<void> refreshEarthquakes() async {
     setState(() {
-      futureEarthquakes = fetchEarthquakes().then((earthquakes) {
-        for (var earthquake in earthquakes) {
-          earthquakes[earthquakes.indexOf(earthquake)] = Earthquake(
-            anm: earthquake.anm,
-            rdt: formatDateTime(earthquake.rdt),
-            mag: earthquake.mag,
-          );
-        }
-        return earthquakes;
-      });
+      futureEarthquakes = fetchEarthquakes();
     });
   }
 
@@ -90,8 +81,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
   }
 
   Future<void> launchUrl(Uri url) async {
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+    if (await canLaunch(url.toString())) {
+      await launch(url.toString());
     } else {
       throw 'Could not launch $url';
     }
@@ -156,25 +147,28 @@ class _EarthquakePageState extends State<_EarthquakePage> {
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else {
-                return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return Card(
-                      margin: const EdgeInsets.all(8),
-                      child: ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
-                            const Divider(),
-                            Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
-                            const Divider(),
-                            Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
-                          ],
+                return RefreshIndicator(
+                  onRefresh: refreshEarthquakes,
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return Card(
+                        margin: const EdgeInsets.all(8),
+                        child: ListTile(
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
+                              const Divider(),
+                              Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
+                              const Divider(),
+                              Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 );
               }
             },
