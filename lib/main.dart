@@ -102,6 +102,49 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('地震情報'),
+        actions: <Widget>[
+          GestureDetector(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Center(
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: 'Modified from ',
+                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                      ),
+                      TextSpan(
+                        text: 'Earthquake information',
+                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            launchUrl(Uri.parse('https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
+                          },
+                      ),
+                      TextSpan(
+                        text: ' provided by ',
+                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                      ),
+                      TextSpan(
+                        text: 'JMA',
+                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            launchUrl(Uri.parse('https://www.jma.go.jp/jma/index.html'));
+                          },
+                      ),
+                      TextSpan(
+                        text: '. Details can be found on the JMA website.',
+                        style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       body: Stack(
         children: <Widget>[
@@ -135,47 +178,6 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                 );
               }
             },
-          ),
-          Positioned(
-            top: 10.0,
-            right: 10.0,
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                      text: 'Modified from ',
-                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
-                    ),
-                    TextSpan(
-                      text: 'Earthquake information',
-                      style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          launchUrl(Uri.parse('https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
-                        },
-                    ),
-                    TextSpan(
-                      text: ' provided by ',
-                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
-                    ),
-                    TextSpan(
-                      text: 'JMA',
-                      style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0), // Changed color to lightBlue
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          launchUrl(Uri.parse('https://www.jma.go.jp/jma/index.html'));
-                        },
-                    ),
-                    TextSpan(
-                      text: '. Details can be found on the JMA website.',
-                      style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontSize: 8.0),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ),
         ],
       ),
