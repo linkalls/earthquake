@@ -90,8 +90,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
   }
 
   Future<void> launchUrl(Uri url) async {
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
     } else {
       throw 'Could not launch $url';
     }
