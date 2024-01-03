@@ -193,7 +193,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                               final earthquakeInfo =
                                   '日時: ${formatDateTime(snapshot.data![index].rdt)}\n'
                                   '震央地名: ${snapshot.data![index].anm}\n'
-                                  'マグニチュード: ${snapshot.data![index].mag}';
+                                  'マグニチュード: ${snapshot.data![index].mag}\n'
+                                  'https://地震.net'; // Add the URL here
                               Share.share(earthquakeInfo);
                             },
                           ),
