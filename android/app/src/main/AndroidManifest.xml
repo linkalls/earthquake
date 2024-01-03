@@ -4,7 +4,7 @@ package="net.xn__cesq99l.earthquakeinfo">
       <uses-permission android:name="android.permission.INTERNET" />
 
     <application
-        android:label="earthquake_fl"
+        android:label="地震情報"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
