@@ -181,11 +181,9 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
-                              const Divider(),
-                              Text('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
-                              const Divider(),
-                              Text('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
+                              SelectableText('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
+                              SelectableText('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
+                              SelectableText('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
                             ],
                           ),
                         ),
