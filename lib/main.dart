@@ -94,8 +94,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
   }
 
   Future<void> launchUrl(Uri url) async {
-   if (await canLaunchUrl(url)) {
-     await launchUrl(url);
+   if (await canLaunch(url.toString())) {
+     await launch(url.toString());
     } else {
       throw 'Could not launch $url';
     }
@@ -118,7 +118,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                       TextSpan(
                         text: 'Modified from',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                           fontSize: 8.0
                         ),
                       ),
@@ -133,7 +133,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                       TextSpan(
                         text: ' provided by\n ',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                           fontSize: 8.0
                         ),
                       ),
@@ -148,7 +148,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                       TextSpan(
                         text: '. Details can be found on the JMA website.',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black, 
+                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
                           fontSize: 8.0
                         ),
                       ),
