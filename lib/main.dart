@@ -5,6 +5,7 @@ import 'models.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:share_plus/share_plus.dart';
 
 void main() {
   runApp(const MyApp());
@@ -187,13 +188,13 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                             ],
                           ),
                           trailing: IconButton(
-                            icon: Icon(Icons.share),
+                            icon: const Icon(Icons.share),
                             onPressed: () {
-                              final earthquakeInfo = '日時: ${formatDateTime(snapshot.data![index].rdt)}\n'
+                              final earthquakeInfo =
+                                  '日時: ${formatDateTime(snapshot.data![index].rdt)}\n'
                                   '震央地名: ${snapshot.data![index].anm}\n'
                                   'マグニチュード: ${snapshot.data![index].mag}';
-                              final tweetUrl = Uri.encodeFull('https://twitter.com/intent/tweet?text=$earthquakeInfo');
-                              launchUrl(Uri.parse(tweetUrl));
+                              Share.share(earthquakeInfo);
                             },
                           ),
                         ),
