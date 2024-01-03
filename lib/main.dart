@@ -186,6 +186,16 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                               SelectableText('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
                             ],
                           ),
+                          trailing: IconButton(
+                            icon: Icon(Icons.share),
+                            onPressed: () {
+                              final earthquakeInfo = '日時: ${formatDateTime(snapshot.data![index].rdt)}\n'
+                                  '震央地名: ${snapshot.data![index].anm}\n'
+                                  'マグニチュード: ${snapshot.data![index].mag}';
+                              final tweetUrl = Uri.encodeFull('https://twitter.com/intent/tweet?text=$earthquakeInfo');
+                              launchUrl(Uri.parse(tweetUrl));
+                            },
+                          ),
                         ),
                       );
                     },
