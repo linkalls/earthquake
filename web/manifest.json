@@ -1,11 +1,11 @@
 {
-    "name": "earthquake_fl",
-    "short_name": "earthquake_fl",
+    "name": "地震情報",
+    "short_name": "地震情報",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "このアプリは、日本の地震情報を取得し、表示するためのものです。",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
