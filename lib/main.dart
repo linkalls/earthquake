@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unused_element
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -14,7 +14,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +61,7 @@ Future<List<Earthquake>> fetchEarthquakes() async {
 }
 
 class _EarthquakePage extends StatefulWidget {
-  const _EarthquakePage({Key? key}) : super(key: key);
+  const _EarthquakePage({super.key});
 
   @override
   _EarthquakePageState createState() => _EarthquakePageState();

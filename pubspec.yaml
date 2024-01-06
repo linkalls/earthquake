@@ -31,20 +31,22 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  http: ^0.13.3
-  intl: ^0.17.0
+  http: ^1.1.2
+  intl: ^0.19.0
   url_launcher: ^6.2.2
-  share_plus: ^5.0.0
+  share_plus: ^7.2.1  # ここを変更
   sqflite: ^2.0.0+4
   path_provider: ^2.1.1
   flutter_launcher_icons: ^0.13.1
-  path: ^1.8.0
-
+  path: ^1.8.3
+  
 flutter_icons:
  android: true
  ios: true
  image_path: "assets/icon/icon.png"
  remove_alpha_ios: true
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
 
@@ -62,7 +64,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.1
   change_app_package_name: 1.1.0
 
 
