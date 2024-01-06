@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, unused_element
+// ignore_for_file: unused_element, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -46,18 +46,12 @@ Future<List<Earthquake>> fetchEarthquakes() async {
   final response = await http
       .get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
 
-  List<Earthquake> earthquakes = []; // Define earthquakes here
-
   if (response.statusCode == 200) {
     List<dynamic> jsonResponse = jsonDecode(response.body);
-    earthquakes =
-        jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-    // Rest of your code...
+    return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
   } else {
     throw Exception('Failed to load earthquake data');
   }
-
-  return earthquakes;
 }
 
 class _EarthquakePage extends StatefulWidget {
@@ -68,17 +62,28 @@ class _EarthquakePage extends StatefulWidget {
 }
 
 class _EarthquakePageState extends State<_EarthquakePage> {
-  late Future<List<Earthquake>> futureEarthquakes;
+  List<Earthquake> earthquakes = [];
 
   @override
   void initState() {
     super.initState();
-    futureEarthquakes = fetchEarthquakes();
+    _loadInitialData();
+  }
+
+  Future<void> _loadInitialData() async {
+    earthquakes = await fetchEarthquakes();
+    setState(() {});
   }
 
   Future<void> refreshEarthquakes() async {
+    List<Earthquake> newEarthquakes = await fetchEarthquakes();
     setState(() {
-      futureEarthquakes = fetchEarthquakes();
+      earthquakes.insertAll(
+          0, newEarthquakes); // Add new data at the top of the list
+      // Assuming you want to keep a maximum of 50 items in the list
+      if (earthquakes.length > 50) {
+        earthquakes = earthquakes.sublist(0, 50);
+      }
     });
   }
 
@@ -175,84 +180,61 @@ class _EarthquakePageState extends State<_EarthquakePage> {
           ),
         ],
       ),
-      body: Stack(
-        children: <Widget>[
-          FutureBuilder<List<Earthquake>>(
-            future: futureEarthquakes,
-            builder: (BuildContext context,
-                AsyncSnapshot<List<Earthquake>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return RefreshIndicator(
-                  onRefresh: refreshEarthquakes,
-                  child: ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return Card(
-                        margin: const EdgeInsets.all(8),
-                        child: ListTile(
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SelectableText(
-                                  '日時: ${formatDateTime(snapshot.data![index].rdt)}',
-                                  style: const TextStyle(fontSize: 18)),
-                              RichText(
-                                text: TextSpan(
-                                  style: DefaultTextStyle.of(context)
-                                      .style
-                                      .copyWith(
-                                          fontSize:
-                                              18), // Default text style with fontSize 18
-                                  children: <TextSpan>[
-                                    const TextSpan(
-                                        text:
-                                            '震央地名: '), // "震央地名:" is not clickable and uses default style
-                                    TextSpan(
-                                      text: snapshot.data![index].anm,
-                                      style: const TextStyle(
-                                          color: Colors
-                                              .lightBlue), // "石川県能登地方" is clickable and light blue
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          final query = Uri.encodeComponent(
-                                              snapshot.data![index].anm);
-                                          final googleMapsUrl =
-                                              "https://www.google.com/maps/search/?api=1&query=$query";
-                                          launchUrl(Uri.parse(googleMapsUrl));
-                                        },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SelectableText(
-                                  'マグニチュード: ${snapshot.data![index].mag}',
-                                  style: const TextStyle(fontSize: 18)),
-                            ],
+      body: RefreshIndicator(
+        onRefresh: refreshEarthquakes,
+        child: ListView.builder(
+          itemCount: earthquakes.length,
+          itemBuilder: (context, index) {
+            return Card(
+              margin: const EdgeInsets.all(8),
+              child: ListTile(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SelectableText(
+                        '日時: ${formatDateTime(earthquakes[index].rdt)}',
+                        style: const TextStyle(fontSize: 18)),
+                    RichText(
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context)
+                            .style
+                            .copyWith(fontSize: 18),
+                        children: <TextSpan>[
+                          const TextSpan(text: '震央地名: '),
+                          TextSpan(
+                            text: earthquakes[index].anm,
+                            style: const TextStyle(color: Colors.lightBlue),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                final query =
+                                    Uri.encodeComponent(earthquakes[index].anm);
+                                final googleMapsUrl =
+                                    "https://www.google.com/maps/search/?api=1&query=$query";
+                                launchUrl(Uri.parse(googleMapsUrl));
+                              },
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.share),
-                            onPressed: () {
-                              final earthquakeInfo =
-                                  '日時: ${formatDateTime(snapshot.data![index].rdt)}\n'
-                                  '震央地名: ${snapshot.data![index].anm}\n'
-                                  'マグニチュード: ${snapshot.data![index].mag}\n'
-                                  'https://地震.net'; // Add the URL here
-                              Share.share(earthquakeInfo);
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              }
-            },
-          ),
-        ],
+                        ],
+                      ),
+                    ),
+                    SelectableText('マグニチュード: ${earthquakes[index].mag}',
+                        style: const TextStyle(fontSize: 18)),
+                  ],
+                ),
+                trailing: IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () {
+                    final earthquakeInfo =
+                        '日時: ${formatDateTime(earthquakes[index].rdt)}\n'
+                        '震央地名: ${earthquakes[index].anm}\n'
+                        'マグニチュード: ${earthquakes[index].mag}\n'
+                        'https://地震.net'; // ここにURLを追加
+                    Share.share(earthquakeInfo);
+                  },
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
