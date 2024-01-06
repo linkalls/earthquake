@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -41,13 +43,15 @@ class MyApp extends StatelessWidget {
 }
 
 Future<List<Earthquake>> fetchEarthquakes() async {
-  final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
+  final response = await http
+      .get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
 
   List<Earthquake> earthquakes = []; // Define earthquakes here
 
   if (response.statusCode == 200) {
     List<dynamic> jsonResponse = jsonDecode(response.body);
-    earthquakes = jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+    earthquakes =
+        jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
     // Rest of your code...
   } else {
     throw Exception('Failed to load earthquake data');
@@ -95,8 +99,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
   }
 
   Future<void> launchUrl(Uri url) async {
-   if (await canLaunch(url.toString())) {
-     await launch(url.toString());
+    if (await canLaunch(url.toString())) {
+      await launch(url.toString());
     } else {
       throw 'Could not launch $url';
     }
@@ -119,39 +123,49 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                       TextSpan(
                         text: 'Modified from',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                          fontSize: 8.0
-                        ),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                            fontSize: 8.0),
                       ),
                       TextSpan(
                         text: 'Earthquake information',
-                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0),
+                        style: const TextStyle(
+                            color: Colors.lightBlue, fontSize: 8.0),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            launchUrl(Uri.parse('https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
+                            launchUrl(Uri.parse(
+                                'https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
                           },
                       ),
                       TextSpan(
                         text: ' provided by\n ',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                          fontSize: 8.0
-                        ),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                            fontSize: 8.0),
                       ),
                       TextSpan(
                         text: 'JMA',
-                        style: const TextStyle(color: Colors.lightBlue, fontSize: 8.0),
+                        style: const TextStyle(
+                            color: Colors.lightBlue, fontSize: 8.0),
                         recognizer: TapGestureRecognizer()
                           ..onTap = () {
-                            launchUrl(Uri.parse('https://www.jma.go.jp/jma/index.html'));
+                            launchUrl(Uri.parse(
+                                'https://www.jma.go.jp/jma/index.html'));
                           },
                       ),
                       TextSpan(
                         text: '. Details can be found on the JMA website.',
                         style: DefaultTextStyle.of(context).style.copyWith(
-                          color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
-                          fontSize: 8.0
-                        ),
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                    ? Colors.white
+                                    : Colors.black,
+                            fontSize: 8.0),
                       ),
                     ],
                   ),
@@ -165,7 +179,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
         children: <Widget>[
           FutureBuilder<List<Earthquake>>(
             future: futureEarthquakes,
-            builder: (BuildContext context, AsyncSnapshot<List<Earthquake>> snapshot) {
+            builder: (BuildContext context,
+                AsyncSnapshot<List<Earthquake>> snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
@@ -182,9 +197,40 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              SelectableText('日時: ${formatDateTime(snapshot.data![index].rdt)}', style: const TextStyle(fontSize: 18)),
-                              SelectableText('震央地名: ${snapshot.data![index].anm}', style: const TextStyle(fontSize: 18)),
-                              SelectableText('マグニチュード: ${snapshot.data![index].mag}', style: const TextStyle(fontSize: 18)),
+                              SelectableText(
+                                  '日時: ${formatDateTime(snapshot.data![index].rdt)}',
+                                  style: const TextStyle(fontSize: 18)),
+                              RichText(
+                                text: TextSpan(
+                                  style: DefaultTextStyle.of(context)
+                                      .style
+                                      .copyWith(
+                                          fontSize:
+                                              18), // Default text style with fontSize 18
+                                  children: <TextSpan>[
+                                    const TextSpan(
+                                        text:
+                                            '震央地名: '), // "震央地名:" is not clickable and uses default style
+                                    TextSpan(
+                                      text: snapshot.data![index].anm,
+                                      style: const TextStyle(
+                                          color: Colors
+                                              .lightBlue), // "石川県能登地方" is clickable and light blue
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          final query = Uri.encodeComponent(
+                                              snapshot.data![index].anm);
+                                          final googleMapsUrl =
+                                              "https://www.google.com/maps/search/?api=1&query=$query";
+                                          launchUrl(Uri.parse(googleMapsUrl));
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SelectableText(
+                                  'マグニチュード: ${snapshot.data![index].mag}',
+                                  style: const TextStyle(fontSize: 18)),
                             ],
                           ),
                           trailing: IconButton(
