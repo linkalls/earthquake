@@ -1,19 +1,23 @@
-
 // models.dart
 
 class Earthquake {
   final int id;
   final String anm;
-  final String rdt;
+  final String at;
   final String mag;
 
-  Earthquake({this.id = 0, this.anm = '', this.rdt = '', this.mag = '', });
+  Earthquake({
+    this.id = 0,
+    this.anm = '',
+    this.at = '',
+    this.mag = '',
+  });
 
   factory Earthquake.fromJson(Map<String, dynamic> json) {
     return Earthquake(
       id: json['id'] ?? 0,
       anm: json['anm'] ?? '',
-      rdt: json['rdt'] ?? '',
+      at: json['at'] ?? '',
       mag: json['mag'] ?? '',
     );
   }
@@ -22,7 +26,7 @@ class Earthquake {
     var map = <String, dynamic>{};
     map["id"] = id;
     map["anm"] = anm;
-    map["rdt"] = rdt;
+    map["at"] = at;
     map["mag"] = mag;
     return map;
   }

@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, deprecated_member_use
+// ignore_for_file: unused_element, avoid_print, deprecated_member_use, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -43,14 +43,21 @@ class MyApp extends StatelessWidget {
 }
 
 Future<List<Earthquake>> fetchEarthquakes() async {
-  final response = await http
-      .get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
-
-  if (response.statusCode == 200) {
-    List<dynamic> jsonResponse = jsonDecode(response.body);
-    return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
-  } else {
-    throw Exception('Failed to load earthquake data');
+  try {
+    final response = await http
+        .get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
+    if (response.statusCode == 200) {
+      List<dynamic> jsonResponse = jsonDecode(response.body);
+      return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+    } else {
+      throw Exception(
+          'Failed to load earthquake data with status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    // ここでエラーを処理する
+    // ignore: avoid_print
+    print('An error occurred while fetching earthquake data: $e');
+    throw Exception('Failed to fetch earthquake data');
   }
 }
 
@@ -97,7 +104,6 @@ class _EarthquakePageState extends State<_EarthquakePage> {
       var parsedDate = inputFormat.parse(dateStr);
       return outputFormat.format(parsedDate);
     } catch (e) {
-      // ignore: avoid_print
       print('Error parsing date: $e');
       return dateStr; // パース失敗時は元の文字列を返す
     }
@@ -192,7 +198,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SelectableText(
-                        '日時: ${formatDateTime(earthquakes[index].rdt)}',
+                        '日時: ${formatDateTime(earthquakes[index].at)}',
                         style: const TextStyle(fontSize: 18)),
                     RichText(
                       text: TextSpan(
@@ -224,7 +230,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                   icon: const Icon(Icons.share),
                   onPressed: () {
                     final earthquakeInfo =
-                        '日時: ${formatDateTime(earthquakes[index].rdt)}\n'
+                        '日時: ${formatDateTime(earthquakes[index].at)}\n'
                         '震央地名: ${earthquakes[index].anm}\n'
                         'マグニチュード: ${earthquakes[index].mag}\n'
                         'https://地震.net'; // ここにURLを追加

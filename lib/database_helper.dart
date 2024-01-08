@@ -27,7 +27,7 @@ class DatabaseHelper {
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE Earthquake(id INTEGER PRIMARY KEY, anm TEXT, rdt TEXT, mag TEXT)");
+        "CREATE TABLE Earthquake(id INTEGER PRIMARY KEY, anm TEXT, at TEXT, mag TEXT)");
   }
 
   //insertion
@@ -40,7 +40,8 @@ class DatabaseHelper {
   //deletion
   Future<int> deleteEarthquake(Earthquake earthquake) async {
     var dbClient = await db;
-    int res = await dbClient.rawDelete('DELETE FROM Earthquake WHERE id = ?', [earthquake.id]);
+    int res = await dbClient
+        .rawDelete('DELETE FROM Earthquake WHERE id = ?', [earthquake.id]);
     return res;
   }
 
@@ -52,7 +53,7 @@ class DatabaseHelper {
       var earthquake = Earthquake(
           id: list[i]["id"],
           anm: list[i]["anm"],
-          rdt: list[i]["rdt"],
+          at: list[i]["at"],
           mag: list[i]["mag"]);
       earthquakes.add(earthquake);
     }
