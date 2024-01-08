@@ -1,5 +1,3 @@
-// ignore_for_file: unused_element, avoid_print, deprecated_member_use, duplicate_ignore
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,6 +6,10 @@ import 'package:intl/intl.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
+
 
 void main() {
   runApp(const MyApp());
@@ -43,26 +45,29 @@ class MyApp extends StatelessWidget {
 }
 
 Future<List<Earthquake>> fetchEarthquakes() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   try {
-    final response = await http
-        .get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
+    final response = await http.get(Uri.parse('https://www.jma.go.jp/bosai/quake/data/list.json'));
     if (response.statusCode == 200) {
+      await prefs.setString('earthquake_data', response.body);
       List<dynamic> jsonResponse = jsonDecode(response.body);
       return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
     } else {
-      throw Exception(
-          'Failed to load earthquake data with status code: ${response.statusCode}');
+      throw Exception('Failed to load earthquake data with status code: ${response.statusCode}');
     }
-  } catch (e) {
-    // ここでエラーを処理する
-    // ignore: avoid_print
-    print('An error occurred while fetching earthquake data: $e');
-    throw Exception('Failed to fetch earthquake data');
+  } on Exception {
+    String? storedData = prefs.getString('earthquake_data');
+    if (storedData != null) {
+      List<dynamic> jsonResponse = jsonDecode(storedData);
+      return jsonResponse.map((item) => Earthquake.fromJson(item)).toList();
+    } else {
+      rethrow;
+    }
   }
 }
 
 class _EarthquakePage extends StatefulWidget {
-  const _EarthquakePage({super.key});
+  const _EarthquakePage();
 
   @override
   _EarthquakePageState createState() => _EarthquakePageState();
@@ -70,11 +75,20 @@ class _EarthquakePage extends StatefulWidget {
 
 class _EarthquakePageState extends State<_EarthquakePage> {
   List<Earthquake> earthquakes = [];
+  final Connectivity _connectivity = Connectivity();
 
   @override
   void initState() {
     super.initState();
     _loadInitialData();
+    _checkConnectivity();
+    _connectivity.onConnectivityChanged.listen((ConnectivityResult result) {
+      if (result != ConnectivityResult.none) {
+        refreshEarthquakes();
+      } else {
+        _showNoConnectivitySnackBar();
+      }
+    });
   }
 
   Future<void> _loadInitialData() async {
@@ -82,16 +96,34 @@ class _EarthquakePageState extends State<_EarthquakePage> {
     setState(() {});
   }
 
+  Future<void> _checkConnectivity() async {
+    var connectivityResult = await _connectivity.checkConnectivity();
+    if (connectivityResult == ConnectivityResult.none) {
+      _showNoConnectivitySnackBar();
+    }
+  }
+
+  void _showNoConnectivitySnackBar() {
+    const snackBar = SnackBar(
+      content: Text('ネットワーク接続がありません。以前のデータを表示しています。'),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   Future<void> refreshEarthquakes() async {
-    List<Earthquake> newEarthquakes = await fetchEarthquakes();
-    setState(() {
-      earthquakes.insertAll(
-          0, newEarthquakes); // Add new data at the top of the list
-      // Assuming you want to keep a maximum of 50 items in the list
-      if (earthquakes.length > 50) {
-        earthquakes = earthquakes.sublist(0, 50);
-      }
-    });
+    var connectivityResult = await _connectivity.checkConnectivity();
+    if (connectivityResult != ConnectivityResult.none) {
+      List<Earthquake> newEarthquakes = await fetchEarthquakes();
+      setState(() {
+        earthquakes.insertAll(0, newEarthquakes); // Add new data at the top of the list
+        if (earthquakes.length > 50) {
+          earthquakes = earthquakes.sublist(0, 50);
+        }
+      });
+    } else {
+      _showNoConnectivitySnackBar();
+    }
   }
 
   String formatDateTime(String? dateStr) {
@@ -104,18 +136,20 @@ class _EarthquakePageState extends State<_EarthquakePage> {
       var parsedDate = inputFormat.parse(dateStr);
       return outputFormat.format(parsedDate);
     } catch (e) {
-      print('Error parsing date: $e');
+      if (kDebugMode) {
+        print('Error parsing date: $e');
+      }
       return dateStr; // パース失敗時は元の文字列を返す
     }
   }
 
-  Future<void> launchUrl(Uri url) async {
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
-    } else {
-      throw 'Could not launch $url';
-    }
+ Future<void> launchUrl(Uri url) async {
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    throw 'Could not launch $url';
   }
+}
 
   @override
   Widget build(BuildContext context) {
