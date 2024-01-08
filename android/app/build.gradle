@@ -65,5 +65,5 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:1.6.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-common:1.9.2"
 }
