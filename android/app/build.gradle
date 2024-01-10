@@ -2,6 +2,8 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
+    // id 'org.jetbrains.kotlin.jvm' version '1.9.20'  // ここを更新
+
 }
 
 def localProperties = new Properties()
@@ -64,6 +66,3 @@ flutter {
     source '../..'
 }
 
-dependencies {
-       implementation "org.jetbrains.kotlin:kotlin-stdlib-common:1.9.0"
-}
