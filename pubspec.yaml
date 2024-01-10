@@ -39,12 +39,7 @@ dependencies:
   path_provider: ^2.1.1
   flutter_launcher_icons: ^0.13.1
   path: ^1.8.3
-<<<<<<< HEAD
   logger: ^2.0.2+1
-=======
-  shared_preferences: ^2.2.2
-  connectivity: ^3.0.6
->>>>>>> 8e6786cb945fe91e00904d4eb7cdbf16eb2fb2e0
   
 flutter_icons:
  android: true

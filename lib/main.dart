@@ -13,8 +13,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
- const MyApp({super.key});
-
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +69,7 @@ class _EarthquakePage extends StatefulWidget {
 
 class _EarthquakePageState extends State<_EarthquakePage> {
   List<Earthquake> earthquakes = [];
-   final Logger logger = Logger();
+  final Logger logger = Logger();
 
   @override
   void initState() {
@@ -109,13 +108,14 @@ class _EarthquakePageState extends State<_EarthquakePage> {
       return dateStr; // パース失敗時は元の文字列を返す
     }
   }
- Future<void> launchUrl(Uri url) async {
-  if (await canLaunchUrl(url)) {
-    await launchUrl(url);
-  } else {
-    throw 'Could not launch $url';
+
+  Future<void> openUrl(Uri url) async {
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      logger.e('Could not launch $url');
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -197,6 +197,8 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                 title: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    SelectableText('情報名: ${earthquakes[index].ttl}', // ttlを表示
+                        style: const TextStyle(fontSize: 18)),
                     SelectableText(
                         '日時: ${formatDateTime(earthquakes[index].at)}',
                         style: const TextStyle(fontSize: 18)),
@@ -224,12 +226,15 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                     ),
                     SelectableText('マグニチュード: ${earthquakes[index].mag}',
                         style: const TextStyle(fontSize: 18)),
+                    SelectableText('最大震度: ${earthquakes[index].maxi}',
+                        style: const TextStyle(fontSize: 18)),
                   ],
                 ),
                 trailing: IconButton(
                   icon: const Icon(Icons.share),
                   onPressed: () {
                     final earthquakeInfo =
+                        '情報名: ${earthquakes[index].ttl}\n'
                         '日時: ${formatDateTime(earthquakes[index].at)}\n'
                         '震央地名: ${earthquakes[index].anm}\n'
                         'マグニチュード: ${earthquakes[index].mag}\n'

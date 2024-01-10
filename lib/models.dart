@@ -5,12 +5,16 @@ class Earthquake {
   final String anm;
   final String at;
   final String mag;
+  final String maxi;
+  final String ttl; // ttlフィールドを追加
 
   Earthquake({
     this.id = 0,
     this.anm = '',
     this.at = '',
     this.mag = '',
+    this.maxi = '',
+    this.ttl = '', // 初期値を追加
   });
 
   factory Earthquake.fromJson(Map<String, dynamic> json) {
@@ -19,6 +23,8 @@ class Earthquake {
       anm: json['anm'] ?? '',
       at: json['at'] ?? '',
       mag: json['mag'] ?? '',
+      maxi: json['maxi'] ?? '',
+      ttl: json['ttl'] ?? '', // JSONから読み込む
     );
   }
 
@@ -28,6 +34,9 @@ class Earthquake {
     map["anm"] = anm;
     map["at"] = at;
     map["mag"] = mag;
+    map["maxi"] = maxi;
+    map["ttl"] = ttl; // マップに追加
     return map;
   }
 }
+

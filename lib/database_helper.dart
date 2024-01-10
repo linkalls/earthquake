@@ -27,7 +27,7 @@ class DatabaseHelper {
 
   void _onCreate(Database db, int version) async {
     await db.execute(
-        "CREATE TABLE Earthquake(id INTEGER PRIMARY KEY, anm TEXT, at TEXT, mag TEXT)");
+        "CREATE TABLE Earthquake(id INTEGER PRIMARY KEY, anm TEXT, at TEXT, mag TEXT, maxi TEXT)");
   }
 
   //insertion
@@ -54,7 +54,8 @@ class DatabaseHelper {
           id: list[i]["id"],
           anm: list[i]["anm"],
           at: list[i]["at"],
-          mag: list[i]["mag"]);
+          mag: list[i]["mag"],
+          maxi: list[i]["maxi"]); // 修正: プロパティとして設定
       earthquakes.add(earthquake);
     }
     return earthquakes;
