@@ -1,5 +1,3 @@
-// ignore_for_file: unused_element, avoid_print, deprecated_member_use, duplicate_ignore
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -8,13 +6,15 @@ import 'package:intl/intl.dart';
 import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:logger/logger.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+ const MyApp({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +62,7 @@ Future<List<Earthquake>> fetchEarthquakes() async {
 }
 
 class _EarthquakePage extends StatefulWidget {
-  const _EarthquakePage({super.key});
+  const _EarthquakePage();
 
   @override
   _EarthquakePageState createState() => _EarthquakePageState();
@@ -70,6 +70,7 @@ class _EarthquakePage extends StatefulWidget {
 
 class _EarthquakePageState extends State<_EarthquakePage> {
   List<Earthquake> earthquakes = [];
+   final Logger logger = Logger();
 
   @override
   void initState() {
@@ -104,18 +105,17 @@ class _EarthquakePageState extends State<_EarthquakePage> {
       var parsedDate = inputFormat.parse(dateStr);
       return outputFormat.format(parsedDate);
     } catch (e) {
-      print('Error parsing date: $e');
+      logger.e('Error parsing date: $e');
       return dateStr; // パース失敗時は元の文字列を返す
     }
   }
-
-  Future<void> launchUrl(Uri url) async {
-    if (await canLaunch(url.toString())) {
-      await launch(url.toString());
-    } else {
-      throw 'Could not launch $url';
-    }
+ Future<void> launchUrl(Uri url) async {
+  if (await canLaunchUrl(url)) {
+    await launchUrl(url);
+  } else {
+    throw 'Could not launch $url';
   }
+}
 
   @override
   Widget build(BuildContext context) {
