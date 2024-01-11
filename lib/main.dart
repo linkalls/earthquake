@@ -1,3 +1,4 @@
+import 'package:earthquake_net/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,10 +8,81 @@ import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:logger/logger.dart';
+import 'package:workmanager/workmanager.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+// 通知プラグインのインスタンスを作成
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+// 通知の初期化設定
+void initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+// 通知を表示する関数
+Future<void> showNotification() async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+      AndroidNotificationDetails(
+    'earthquake_update_channel', // チャネルID
+    'Earthquake Updates', // チャネル名
+    channelDescription:
+        'Notification channel for earthquake updates', // チャネルの説明
+    importance: Importance.max,
+    priority: Priority.high,
+    ticker: 'ticker',
+  );
+
+  const NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    0, // 通知ID
+    '更新情報', // 通知タイトル
+    '地震情報が更新されました。', // 通知内容
+    platformChannelSpecifics,
+  );
+}
+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    if (task == 'fetchEarthquakeData') {
+      // 地震データをフェッチするロジックをここに追加
+      List<Earthquake> isUpdated = await fetchEarthquakes();
+      if (isUpdated.isNotEmpty) {
+        // データが更新された場合は通知を表示
+        await showNotification();
+      }
+    }
+    return Future.value(true);
+  });
+}
 
 void main() {
+  initializeNotifications(); // 通知の初期化
+  Workmanager().initialize(
+    callbackDispatcher, // 上で定義したコールバック関数
+    isInDebugMode: false, // デバッグモードをオフにする
+  );
+  Workmanager().registerPeriodicTask(
+    '1',
+    'fetchEarthquakeData',
+    frequency: const Duration(minutes: 15), // 15分ごとに実行
+    constraints: Constraints(
+      networkType: NetworkType.connected, // インターネット接続が必要
+    ),
+  );
   runApp(const MyApp());
 }
+
+// 以下、MyAppクラスとその他のウィジェット、関数などのコード...
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -123,69 +195,17 @@ class _EarthquakePageState extends State<_EarthquakePage> {
       appBar: AppBar(
         title: const Text('地震情報'),
         actions: <Widget>[
-          GestureDetector(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Modified from',
-                        style: DefaultTextStyle.of(context).style.copyWith(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontSize: 8.0),
-                      ),
-                      TextSpan(
-                        text: 'Earthquake information',
-                        style: const TextStyle(
-                            color: Colors.lightBlue, fontSize: 8.0),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrl(Uri.parse(
-                                'https://www.jma.go.jp/bosai/#lang=en&pattern=earthquake_volcano'));
-                          },
-                      ),
-                      TextSpan(
-                        text: ' provided by\n ',
-                        style: DefaultTextStyle.of(context).style.copyWith(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontSize: 8.0),
-                      ),
-                      TextSpan(
-                        text: 'JMA',
-                        style: const TextStyle(
-                            color: Colors.lightBlue, fontSize: 8.0),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () {
-                            launchUrl(Uri.parse(
-                                'https://www.jma.go.jp/jma/index.html'));
-                          },
-                      ),
-                      TextSpan(
-                        text: '. Details can be found on the JMA website.',
-                        style: DefaultTextStyle.of(context).style.copyWith(
-                            color:
-                                Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : Colors.black,
-                            fontSize: 8.0),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => const SettingsPage(),
+     ));
+          },
+        ),
+      ],
+    ),
+    
       body: RefreshIndicator(
         onRefresh: refreshEarthquakes,
         child: ListView.builder(
@@ -233,8 +253,7 @@ class _EarthquakePageState extends State<_EarthquakePage> {
                 trailing: IconButton(
                   icon: const Icon(Icons.share),
                   onPressed: () {
-                    final earthquakeInfo =
-                        '情報名: ${earthquakes[index].ttl}\n'
+                    final earthquakeInfo = '情報名: ${earthquakes[index].ttl}\n'
                         '日時: ${formatDateTime(earthquakes[index].at)}\n'
                         '震央地名: ${earthquakes[index].anm}\n'
                         'マグニチュード: ${earthquakes[index].mag}\n'
