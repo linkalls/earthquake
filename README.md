@@ -1,7 +1,6 @@
 # 地震情報アプリ
 このアプリは、日本の地震情報を取得し、表示するためのものです。
-
-[apkはこちらから](https://u.pcloud.link/publink/show?code=XZTv8X0ZEei9SYB9hImCpzL4eBKxjpoiWrHX)
+(ただいまuptodownとamazon app storeでアプリ公開申請をしています)
 
 # 機能
 - 地震情報の取得と表示
