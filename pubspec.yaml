@@ -21,7 +21,6 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   path: ^1.8.3
   dio: ^5.7.0
-  win32: ^5.9.0
   flutter_hooks: ^0.20.5
   
 flutter_icons:

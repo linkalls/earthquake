@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
+
+// import 'dart:convert';
 import 'models.dart';
-import "package:intl/intl.dart";
-import 'package:flutter/gestures.dart';
+// import "package:intl/intl.dart";
+// import 'package:flutter/gestures.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
+// import 'package:share_plus/share_plus.dart';
 import "package:dio/dio.dart";
 import 'package:flutter_hooks/flutter_hooks.dart';
+import "package:earthquake_net/info_page.dart";
 
 void main() {
   runApp(const MyApp());
@@ -18,93 +20,129 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: '地震情報',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.light,
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.black),
-          bodyMedium: TextStyle(color: Colors.black),
+        debugShowCheckedModeBanner: false,
+        title: '地震情報',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.light,
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.black),
+            bodyMedium: TextStyle(color: Colors.black),
+          ),
         ),
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        brightness: Brightness.dark,
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
+        darkTheme: ThemeData(
+          primarySwatch: Colors.blue,
+          brightness: Brightness.dark,
+          textTheme: const TextTheme(
+            bodyLarge: TextStyle(color: Colors.white),
+            bodyMedium: TextStyle(color: Colors.white),
+          ),
         ),
-      ),
-      // home:  _EarthquakePage(),
-      home: SafeArea(
-        child: _EarthQuake(),
-      ),
-    );
+        // home:  _EarthquakePage(),
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('地震情報'),
+            centerTitle: true,
+            backgroundColor: Colors.blue[900],
+          ),
+          body: SafeArea(
+            child: _EarthQuake(),
+          ),
+        ));
   }
 }
 
 class _EarthQuake extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final _earthquakes =
+    final earthquakes =
         useState<List<Earthquake>>([]); //* List型のearthquakesを作ってる
     useEffect(() {
       //* useEffectはasyncを使えないから.thenを使う
       //* 初回のみfetchEarthquakesを呼び出して_earthquakesに値を入れる
-      fetchEarthquakes().then((earthquakes) {
-        _earthquakes.value = earthquakes;
+      fetchEarthquakes().then((fetchedEarthquakes) {
+        earthquakes.value = fetchedEarthquakes;
       });
       return null; // Dispose function is not needed here
     }, []);
 
-    if (_earthquakes.value.isEmpty) {
+    if (earthquakes.value.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(), // ローディング表示
       );
     }
 
     return Scaffold(
-        // body: CustomScrollView(
-        //   slivers: <Widget>[
-        //     SliverList(
-        //       delegate: SliverChildBuilderDelegate(
-        //         (BuildContext context, int index) {
-        //           return Container(
-        //             margin: const EdgeInsets.all(8),
-        //             child: Card(
-        //               child: Column(
-        //                 children: [
-        //                   Text('情報名: ${_earthquakes.value[index].ttl}'),
-        //                   Text('日時: ${_earthquakes.value[index].anm}'),
-        //                 ],
-        //               ),
-        //             ),
-        //           );
-        //         },
-        //         childCount: _earthquakes.value.length,
-        //       ),
-        //     ),
-        //   ],
-        // ),
         body: Center(
       child: ListView.builder(
-          itemCount: 20,
-          itemExtent: 100.0, // 各アイテムの高さを指定
+          itemCount: earthquakes.value.length,
           itemBuilder: (BuildContext context, int index) {
             return Container(
                 margin: const EdgeInsets.all(8),
                 child: Card(
-                    child: Column(
-                  children: [
-                    SelectableText('情報名: ${_earthquakes.value[index].ttl}'),
-                    SelectableText('震源地名: ${_earthquakes.value[index].anm}'),
-                  ],
+                    child: Padding(
+                  //* cardの中にpaddingを追加
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      SelectableText('情報名: ${earthquakes.value[index].ttl}'),
+                      GestureDetector(
+                        //* GestureDetectorでタップイベントを追加
+                        onTap: () {
+                          final url =
+                              googleMapsUrl(earthquakes.value[index].anm);
+                          launchUrl(Uri.parse(url));
+                        },
+                        child: Text(
+                          '震源地名: ${earthquakes.value[index].anm}',
+                          style: const TextStyle(
+                              color: Colors.blue), // リンクっぽく見せるために色を変更
+                        ),
+                      ),
+                      SelectableText(
+                          'マグニチュード: ${earthquakes.value[index].mag}'),
+                      SelectableText('最大震度: ${earthquakes.value[index].maxi}'),
+                      // Text(earthquakes.value[index].json),
+                      ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      InfoPage(earthquakes.value[index].json)),
+                            );
+                          },
+                          child: const Text("詳細をみる")),
+                    ],
+                  ),
                 )));
           }),
     ));
   }
 }
+
+// body: CustomScrollView(
+//   slivers: <Widget>[
+//     SliverList(
+//       delegate: SliverChildBuilderDelegate(
+//         (BuildContext context, int index) {
+//           return Container(
+//             margin: const EdgeInsets.all(8),
+//             child: Card(
+//               child: Column(
+//                 children: [
+//                   Text('情報名: ${_earthquakes.value[index].ttl}'),
+//                   Text('日時: ${_earthquakes.value[index].anm}'),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//         childCount: _earthquakes.value.length,
+//       ),
+//     ),
+//   ],
+// ),
 
 Future<List<Earthquake>> fetchEarthquakes() async {
   final dio = Dio();
@@ -123,6 +161,11 @@ Future<List<Earthquake>> fetchEarthquakes() async {
     throw Exception(
         'Failed to load earthquake data with status code: ${response.statusCode}');
   }
+}
+
+String googleMapsUrl(String anm) {
+  final query = Uri.encodeComponent(anm);
+  return "https://www.google.com/maps/search/?api=1&query=$query";
 }
 
 // Future<List<Earthquake>> fetchEarthquakes() async {
