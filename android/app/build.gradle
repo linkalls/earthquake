@@ -2,8 +2,6 @@ plugins {
     id "com.android.application"
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
-    // id 'org.jetbrains.kotlin.jvm' version '1.9.20'  // ここを更新
-
 }
 
 def localProperties = new Properties()
@@ -28,6 +26,10 @@ android {
     namespace "net.xn__cesq99l.earthquakeinfo"
     compileSdkVersion flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
+
+     kotlinOptions {
+        jvmTarget = '1.8'
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
