@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import "package:dio/dio.dart";
@@ -34,15 +33,22 @@ class InfoPage extends HookWidget {
                   //* nullでない場合
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    SelectableText(
                       _earthquake.value?['Head']?['Headline']?['Text'] ??
                           '見つかりませんでした',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18),
+                      style: const TextStyle(fontSize: 18),
+                    ),
+                    SelectableText(
+                      _earthquake.value?["Body"]?["Comments"]
+                              ?['ForecastComment']?['Text'] ??
+                          '見つかりませんでした',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 18),
                     ),
                   ],
                 )
-              : CircularProgressIndicator(), //* nullの場合
+              : const CircularProgressIndicator(), //* nullの場合
         ),
       ),
     );
