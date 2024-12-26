@@ -25,6 +25,7 @@ mixin _$Earthquake {
   String get mag => throw _privateConstructorUsedError;
   String get maxi => throw _privateConstructorUsedError;
   String get json => throw _privateConstructorUsedError;
+  String get at => throw _privateConstructorUsedError;
 
   /// Serializes this Earthquake to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -42,7 +43,13 @@ abstract class $EarthquakeCopyWith<$Res> {
           Earthquake value, $Res Function(Earthquake) then) =
       _$EarthquakeCopyWithImpl<$Res, Earthquake>;
   @useResult
-  $Res call({String anm, String ttl, String mag, String maxi, String json});
+  $Res call(
+      {String anm,
+      String ttl,
+      String mag,
+      String maxi,
+      String json,
+      String at});
 }
 
 /// @nodoc
@@ -65,6 +72,7 @@ class _$EarthquakeCopyWithImpl<$Res, $Val extends Earthquake>
     Object? mag = null,
     Object? maxi = null,
     Object? json = null,
+    Object? at = null,
   }) {
     return _then(_value.copyWith(
       anm: null == anm
@@ -87,6 +95,10 @@ class _$EarthquakeCopyWithImpl<$Res, $Val extends Earthquake>
           ? _value.json
           : json // ignore: cast_nullable_to_non_nullable
               as String,
+      at: null == at
+          ? _value.at
+          : at // ignore: cast_nullable_to_non_nullable
+              as String,
     ) as $Val);
   }
 }
@@ -99,7 +111,13 @@ abstract class _$$EarthquakeImplCopyWith<$Res>
       __$$EarthquakeImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String anm, String ttl, String mag, String maxi, String json});
+  $Res call(
+      {String anm,
+      String ttl,
+      String mag,
+      String maxi,
+      String json,
+      String at});
 }
 
 /// @nodoc
@@ -120,6 +138,7 @@ class __$$EarthquakeImplCopyWithImpl<$Res>
     Object? mag = null,
     Object? maxi = null,
     Object? json = null,
+    Object? at = null,
   }) {
     return _then(_$EarthquakeImpl(
       anm: null == anm
@@ -142,19 +161,25 @@ class __$$EarthquakeImplCopyWithImpl<$Res>
           ? _value.json
           : json // ignore: cast_nullable_to_non_nullable
               as String,
+      at: null == at
+          ? _value.at
+          : at // ignore: cast_nullable_to_non_nullable
+              as String,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$EarthquakeImpl with DiagnosticableTreeMixin implements _Earthquake {
+class _$EarthquakeImpl extends _Earthquake with DiagnosticableTreeMixin {
   const _$EarthquakeImpl(
       {this.anm = "情報がうまく取得できませんでした",
       this.ttl = "情報がうまく取得できませんでした",
       this.mag = "情報がうまく取得できませんでした",
       this.maxi = "情報がうまく取得できませんでした",
-      this.json = "情報がうまく取得できませんでした"});
+      this.json = "情報がうまく取得できませんでした",
+      this.at = "時間をうまく取得できませんでした"})
+      : super._();
 
   factory _$EarthquakeImpl.fromJson(Map<String, dynamic> json) =>
       _$$EarthquakeImplFromJson(json);
@@ -174,10 +199,13 @@ class _$EarthquakeImpl with DiagnosticableTreeMixin implements _Earthquake {
   @override
   @JsonKey()
   final String json;
+  @override
+  @JsonKey()
+  final String at;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
-    return 'Earthquake(anm: $anm, ttl: $ttl, mag: $mag, maxi: $maxi, json: $json)';
+    return 'Earthquake(anm: $anm, ttl: $ttl, mag: $mag, maxi: $maxi, json: $json, at: $at)';
   }
 
   @override
@@ -189,7 +217,8 @@ class _$EarthquakeImpl with DiagnosticableTreeMixin implements _Earthquake {
       ..add(DiagnosticsProperty('ttl', ttl))
       ..add(DiagnosticsProperty('mag', mag))
       ..add(DiagnosticsProperty('maxi', maxi))
-      ..add(DiagnosticsProperty('json', json));
+      ..add(DiagnosticsProperty('json', json))
+      ..add(DiagnosticsProperty('at', at));
   }
 
   @override
@@ -201,12 +230,13 @@ class _$EarthquakeImpl with DiagnosticableTreeMixin implements _Earthquake {
             (identical(other.ttl, ttl) || other.ttl == ttl) &&
             (identical(other.mag, mag) || other.mag == mag) &&
             (identical(other.maxi, maxi) || other.maxi == maxi) &&
-            (identical(other.json, json) || other.json == json));
+            (identical(other.json, json) || other.json == json) &&
+            (identical(other.at, at) || other.at == at));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, anm, ttl, mag, maxi, json);
+  int get hashCode => Object.hash(runtimeType, anm, ttl, mag, maxi, json, at);
 
   /// Create a copy of Earthquake
   /// with the given fields replaced by the non-null parameter values.
@@ -224,13 +254,15 @@ class _$EarthquakeImpl with DiagnosticableTreeMixin implements _Earthquake {
   }
 }
 
-abstract class _Earthquake implements Earthquake {
+abstract class _Earthquake extends Earthquake {
   const factory _Earthquake(
       {final String anm,
       final String ttl,
       final String mag,
       final String maxi,
-      final String json}) = _$EarthquakeImpl;
+      final String json,
+      final String at}) = _$EarthquakeImpl;
+  const _Earthquake._() : super._();
 
   factory _Earthquake.fromJson(Map<String, dynamic> json) =
       _$EarthquakeImpl.fromJson;
@@ -245,6 +277,8 @@ abstract class _Earthquake implements Earthquake {
   String get maxi;
   @override
   String get json;
+  @override
+  String get at;
 
   /// Create a copy of Earthquake
   /// with the given fields replaced by the non-null parameter values.

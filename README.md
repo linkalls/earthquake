@@ -24,3 +24,7 @@ samples, guidance on mobile development, and a full API reference.
 
 これで Java 17 が正しく設定されているはずです。再度 Gradle ビルドを試みてください。
 
+
+```bash
+dart run build_runner build --delete-conflicting-outputs
+```

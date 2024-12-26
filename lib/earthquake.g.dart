@@ -13,6 +13,7 @@ _$EarthquakeImpl _$$EarthquakeImplFromJson(Map<String, dynamic> json) =>
       mag: json['mag'] as String? ?? "情報がうまく取得できませんでした",
       maxi: json['maxi'] as String? ?? "情報がうまく取得できませんでした",
       json: json['json'] as String? ?? "情報がうまく取得できませんでした",
+      at: json['at'] as String? ?? "時間をうまく取得できませんでした",
     );
 
 Map<String, dynamic> _$$EarthquakeImplToJson(_$EarthquakeImpl instance) =>
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$EarthquakeImplToJson(_$EarthquakeImpl instance) =>
       'mag': instance.mag,
       'maxi': instance.maxi,
       'json': instance.json,
+      'at': instance.at,
     };

@@ -82,51 +82,52 @@ class _EarthQuake extends HookWidget {
           child: ListView.builder(
             itemCount: earthquakes.value.length,
             itemBuilder: (BuildContext context, int index) {
-              return Container(
-                margin: const EdgeInsets.all(8),
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      children: [
-                        Text(
-                          '情報名: ${earthquakes.value[index].ttl}',
-                          style: const TextStyle(fontSize: 20),
+              return Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        '情報名: ${earthquakes.value[index].ttl}',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        "発生日時: ${earthquakes.value[index].getFormattedDate()}",
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          final url =
+                              googleMapsUrl(earthquakes.value[index].anm);
+                          launchUrl(Uri.parse(url));
+                        },
+                        child: Text(
+                          '震源地名: ${earthquakes.value[index].anm}',
+                          style:
+                              const TextStyle(color: Colors.blue, fontSize: 20),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            final url =
-                                googleMapsUrl(earthquakes.value[index].anm);
-                            launchUrl(Uri.parse(url));
-                          },
-                          child: Text(
-                            '震源地名: ${earthquakes.value[index].anm}',
-                            style: const TextStyle(
-                                color: Colors.blue, fontSize: 20),
-                          ),
-                        ),
-                        SelectableText(
-                          'マグニチュード: ${earthquakes.value[index].mag}',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        SelectableText(
-                          '最大震度: ${earthquakes.value[index].maxi}',
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    InfoPage(earthquakes.value[index].json),
-                              ),
-                            );
-                          },
-                          child: const Text("詳細をみる"),
-                        ),
-                      ],
-                    ),
+                      ),
+                      SelectableText(
+                        'マグニチュード: ${earthquakes.value[index].mag}',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      SelectableText(
+                        '最大震度: ${earthquakes.value[index].maxi}',
+                        style: const TextStyle(fontSize: 20),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  InfoPage(earthquakes.value[index].json),
+                            ),
+                          );
+                        },
+                        child: const Text("詳細をみる"),
+                      ),
+                    ],
                   ),
                 ),
               );

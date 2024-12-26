@@ -37,6 +37,7 @@ dependencies:
   dio_smart_retry: ^7.0.1
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
+  intl: ^0.20.1
   
 
 dev_dependencies:
