@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:earthquake/info_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:dio_smart_retry/dio_smart_retry.dart';
 
 void main() {
   runApp(const MyApp());
@@ -139,6 +140,17 @@ class _EarthQuake extends HookWidget {
 
 Future<List<Earthquake>> fetchEarthquakes() async {
   final dio = Dio();
+  dio.interceptors.add(RetryInterceptor(
+    dio: dio,
+    logPrint: print, // specify log function (optional)
+    retries: 3, // retry count (optional)
+    retryDelays: const [
+      // set delays between retries (optional)
+      Duration(seconds: 1), // wait 1 sec before first retry
+      Duration(seconds: 2), // wait 2 sec before second retry
+      Duration(seconds: 3), // wait 3 sec before third retry
+    ],
+  ));
   final response =
       await dio.get("https://www.jma.go.jp/bosai/quake/data/list.json");
   if (response.statusCode == 200) {
