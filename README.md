@@ -1,40 +1,26 @@
-# 地震情報アプリ
+# earthquake
 
-このアプリは、日本の地震情報を取得し、表示するためのものです。現在、Amazon App Storeでアプリが公開されています。
+A new Flutter project.
 
-## 機能
+## Getting Started
 
-- 地震情報の取得と表示
-- 地震情報の更新（プルダウンで更新）
-- 地震情報のソート（新しい情報が上に来るように）
+This project is a starting point for a Flutter application.
 
-## 使用技術
+A few resources to get you started if this is your first Flutter project:
 
-- Dart
-- Flutter
-- http パッケージ（APIからデータを取得するため）
-- intl パッケージ（日付の解析とフォーマットのため）
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-## 使い方
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
 
-1. アプリを起動します。
-2. 地震情報が自動的に取得され、リストとして表示されます。
-3. 最新の情報を取得するには、リストをプルダウンして更新します。
+1. **PowerShell での設定**:
+   - PowerShell を使用している場合、以下のコマンドを実行して環境変数を設定します。
+     ```powershell
+     $env:JAVA_HOME="C:\Program Files\jdk-17.0.2"
+     $env:Path="$env:JAVA_HOME\bin;$env:Path"
+     ```
 
-## Amazon App Store での公開
-
-アプリはAmazon App Storeでも公開されています。詳細は以下のリンクからご確認いただけます。
-[Amazon App Store - 地震情報アプリ](https://www.amazon.co.jp/gp/product/B0CTY69K1M)
-
-## 注意事項
-
-このアプリはデモ用であり、地震情報の正確性や完全性を保証するものではありません。地震情報は公式の気象庁の発表をご確認ください。
-
-## ライセンス
-
-このプロジェクトはMITライセンスの下で公開されています。詳細はLICENSEをご覧ください。
-
-## Todoリスト
-
-- ネットがないときに前回表示したデータを保持して、ネットに接続したら自動的に更新する処理
+これで Java 17 が正しく設定されているはずです。再度 Gradle ビルドを試みてください。
 
