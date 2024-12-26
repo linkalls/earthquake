@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:earthquake/models.dart';
+import 'package:earthquake/earthquake.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -89,7 +89,7 @@ class _EarthQuake extends HookWidget {
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
-                        SelectableText(
+                        Text(
                           '情報名: ${earthquakes.value[index].ttl}',
                           style: const TextStyle(fontSize: 20),
                         ),
