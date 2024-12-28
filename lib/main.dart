@@ -6,6 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:earthquake/info_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
+import 'package:go_router/go_router.dart';
+import "package:earthquake/router.dart";
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +18,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
+      routerConfig: router,
       debugShowCheckedModeBanner: false,
       title: '地震情報',
       theme: ThemeData(
@@ -35,21 +38,21 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Colors.white),
         ),
       ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('地震情報'),
-          centerTitle: true,
-          backgroundColor: const Color.fromARGB(255, 17, 18, 20),
-        ),
-        body: SafeArea(
-          child: _EarthQuake(),
-        ),
-      ),
+      // home: Scaffold(
+      //   appBar: AppBar(
+      //     title: const Text('地震情報'),
+      //     centerTitle: true,
+      //     backgroundColor: const Color.fromARGB(255, 17, 18, 20),
+      //   ),
+      //   body: SafeArea(
+      //     child: _EarthQuake(),
+      //   ),
+      // ),
     );
   }
 }
 
-class _EarthQuake extends HookWidget {
+class EarthQuake extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final earthquakes = useState<List<Earthquake>>([]);
@@ -73,65 +76,84 @@ class _EarthQuake extends HookWidget {
     }
 
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () async {
-          print("hello");
-          earthquakes.value = await fetchEarthquakes();
-        },
-        child: Center(
-          child: ListView.builder(
-            itemCount: earthquakes.value.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        '情報名: ${earthquakes.value[index].ttl}',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      Text(
-                        "発生日時: ${earthquakes.value[index].getFormattedDate()}",
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          final url =
-                              googleMapsUrl(earthquakes.value[index].anm);
-                          launchUrl(Uri.parse(url));
-                        },
-                        child: Text(
-                          '震源地名: ${earthquakes.value[index].anm}',
-                          style:
-                              const TextStyle(color: Colors.blue, fontSize: 20),
+      appBar: AppBar(
+        title: const Text('地震情報'),
+        centerTitle: true,
+        backgroundColor: const Color.fromARGB(255, 17, 18, 20),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+                onPressed: () {
+                  context.push("/settings");
+                },
+                icon: const Icon(Icons.settings)),
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            print("hello");
+            earthquakes.value = await fetchEarthquakes();
+          },
+          child: Center(
+            child: ListView.builder(
+              itemCount: earthquakes.value.length,
+              itemBuilder: (BuildContext context, int index) {
+                return Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          '情報名: ${earthquakes.value[index].ttl}',
+                          style: const TextStyle(fontSize: 20),
                         ),
-                      ),
-                      SelectableText(
-                        'マグニチュード: ${earthquakes.value[index].mag}',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      SelectableText(
-                        '最大震度: ${earthquakes.value[index].maxi}',
-                        style: const TextStyle(fontSize: 20),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  InfoPage(earthquakes.value[index].json),
-                            ),
-                          );
-                        },
-                        child: const Text("詳細をみる"),
-                      ),
-                    ],
+                        Text(
+                          "発生日時: ${earthquakes.value[index].getFormattedDate()}",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            final url =
+                                googleMapsUrl(earthquakes.value[index].anm);
+                            launchUrl(Uri.parse(url));
+                          },
+                          child: Text(
+                            '震源地名: ${earthquakes.value[index].anm}',
+                            style: const TextStyle(
+                                color: Colors.blue, fontSize: 20),
+                          ),
+                        ),
+                        SelectableText(
+                          'マグニチュード: ${earthquakes.value[index].mag}',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        SelectableText(
+                          '最大震度: ${earthquakes.value[index].maxi}',
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) =>
+                            //         InfoPage(earthquakes.value[index].json),
+                            //   ),
+                            // );
+                            context
+                                .push("/info/${earthquakes.value[index].json}");
+                          },
+                          child: const Text("詳細をみる"),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
