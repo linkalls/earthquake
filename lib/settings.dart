@@ -2,6 +2,13 @@ import "package:flutter/material.dart";
 import "package:flutter_hooks/flutter_hooks.dart";
 import "package:shared_preferences/shared_preferences.dart";
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import "package:flutter_local_notifications/flutter_local_notifications.dart";
+import "dart:io";
+import 'package:permission_handler/permission_handler.dart';
+import "package:go_router/go_router.dart";
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 class Settings extends HookWidget {
   const Settings({super.key});
@@ -12,13 +19,29 @@ class Settings extends HookWidget {
 
     useEffect(() {
       Future<void> loadSettings() async {
-        final prefs = await SharedPreferences.getInstance();
-        settings.value = prefs.getBool("settings") ?? false;
+        final preferences = await SharedPreferences.getInstance();
+        settings.value = preferences.getBool("settings") ?? false;
+      }
+
+      Future<void> initializeNotifications() async {
+        const AndroidInitializationSettings initializationSettingsAndroid =
+            AndroidInitializationSettings('@mipmap/ic_launcher');
+
+        final InitializationSettings initializationSettings =
+            InitializationSettings(
+          android: initializationSettingsAndroid,
+        );
+
+        await flutterLocalNotificationsPlugin
+            .initialize(initializationSettings);
       }
 
       loadSettings();
+      initializeNotifications();
+
       return null;
     }, []);
+
     if (settings.value == null) {
       return Scaffold(
         body: Center(
@@ -29,6 +52,7 @@ class Settings extends HookWidget {
         ),
       );
     }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('設定'),
@@ -43,10 +67,49 @@ class Settings extends HookWidget {
               SwitchListTile(
                 value: settings.value!,
                 onChanged: (value) async {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setBool("settings", value);
+                  final preferences = await SharedPreferences.getInstance();
+                  await preferences.setBool("settings", value);
                   settings.value = value;
-                  
+
+                  if (value && Platform.isAndroid) {
+                    var status = await Permission.notification.status;
+                    if (!status.isGranted || status.isRestricted) {
+                      status = await Permission.notification.request();
+                      if (status.isGranted) {
+                        await _showNotification(
+                            title: "通知を有効化しました", context: "通知を受け取るようになりました");
+                      } else if (status.isPermanentlyDenied) {
+                        // ユーザーに設定画面を開くように促す
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('通知の許可が必要です'),
+                            content:
+                                const Text('通知を受け取るには、設定画面で通知の許可を有効にしてください。'),
+                            actions: [
+                              TextButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await openAppSettings();
+                                },
+                                child: const Text('設定を開く'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // Navigator.of(context).pop();
+                                  context.pop('/settings');
+                                },
+                                child: const Text('キャンセル'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                    } else {
+                      await _showNotification(
+                          title: "通知を有効化しました", context: "通知を受け取るようになりました");
+                    }
+                  }
                 },
                 title: const Text("バックグラウンド通知を受け取る"),
               ),
@@ -54,6 +117,28 @@ class Settings extends HookWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> _showNotification(
+      {required String title, required String context}) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'earthquake_channel_id',
+      '地震情報',
+      channelDescription: '地震情報を通知します',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false,
+    );
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      context,
+      platformChannelSpecifics,
+      payload: 'item x',
     );
   }
 }

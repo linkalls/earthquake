@@ -2,9 +2,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- ここから下の2行が通知の許可を求めるためのコードです。 -->
     
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> 
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
     <application
         android:label="earthquake"
         android:name="${applicationName}"

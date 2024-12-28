@@ -3,13 +3,42 @@ import 'package:earthquake/earthquake.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:earthquake/info_page.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:go_router/go_router.dart';
 import "package:earthquake/router.dart";
+import "package:workmanager/workmanager.dart";
+import "dart:math";
+
+@pragma(
+    'vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    print(
+        "Native called background task: $task"); //simpleTask will be emitted here.
+    return Future.value(true);
+  });
+}
 
 void main() {
+//   WidgetsFlutterBinding.ensureInitialized();
+
+//   Workmanager().initialize(
+//       callbackDispatcher, // The top level function, aka callbackDispatcher
+//       isInDebugMode:
+//           true // If enabled it will post a notification whenever the task is running. Handy for debugging tasks
+//       );
+
+//   // One-off task to run immediately
+//   // Workmanager().registerOneOffTask(
+//   //   "${Random().nextInt(10100000)}", //* ここは他と被っちゃだめ
+//   //   "fetchEarthquakeData",
+//   // );
+//   Workmanager().registerPeriodicTask(
+//     "2",
+//     "fetchEarthquakeData",
+//     frequency: const Duration(minutes: 15),
+//   );
   runApp(const MyApp());
 }
 
